@@ -7,6 +7,7 @@
 import Foundation
 
 class Node<T> {
+    
     var value: T
     var next: Node?
 
@@ -15,40 +16,76 @@ class Node<T> {
     }
 }
 
-struct Queue<T> {
-    private var front: Node<T>?
-    private var rear: Node<T>?
-
-    mutating func enqueue(_ value: T) {
-        let newNode = Node(value: value)
-        if isEmpty() {
-            front = newNode
-            rear = newNode
-        } else {
-            rear?.next = newNode
-            rear = newNode
+class LinkedList<T: Equatable> {
+    var head: Node<T>?
+    var tail: Node<T>?
+    
+    func append(_ data: T) {
+        if head != nil {
+            tail?.next = Node(value: data)
+            tail = tail?.next
+        }  else {
+            head = Node(value: data)
+            tail = head
         }
     }
-
-    mutating func dequeue() -> T? {
-        guard let currentFront = front else { return nil }
-        front = currentFront.next
-        if front == nil {
-            rear = nil
+    
+    func remove(_ at: Int) {
+        if at == 1 {
+            head = head?.next
+            if head == nil {
+                tail = nil
+            }
+            return
         }
-        return currentFront.value
+        let previous = searchNodeIndex(with: at - 1)
+        previous?.next = previous?.next?.next
+        
     }
+    
+    func searchNodeIndex(with index: Int) -> Node<T>? {
+        var now = head
+        for i in 1...index {
+            if index == 1 || i == index || now?.next == nil {
+                return now
+            }
+            now = now?.next
+        }
+        return now
+    }
+    
+    func searchNodeValue(with: T) -> Node<T>? {
+        var now = head
+        var index = 1
+        while now?.next != nil {
+            if now?.value == with {
+                return now
+            }
+            now = now?.next
+            index += 1
+        }
+        return now
+    }
+}
 
-    func peek() -> T? {
-        return front?.value
+class Queue<T> {
+    
+    var linkedList = LinkedList<Int>()
+    
+    var isEmpty: Bool {
+        return linkedList.head == nil
     }
-
-    func isEmpty() -> Bool {
-        return front == nil
+    
+    var peek: Int? {
+        return linkedList.head?.value
     }
-
-    mutating func clear() {
-        front = nil
-        rear = nil
+    
+    func enqueue(_ value: Int) {
+        linkedList.append(value)
     }
+    
+    func dequeue() {
+        linkedList.remove(1)
+    }
+    
 }
